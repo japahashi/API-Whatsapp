@@ -1,45 +1,131 @@
-const { contatos } = require("./contatos")
+const { contatos } = require("./funcoes.js")
 
-function dadosUsuarios(){
-
-    return contatos['whats-users']
-    
+function listarDadosUsuarios() {
+    return contatos["whats-users"]
 }
 
-function dadosProfile(numero){
+function listarDadosConta(numero) {
+    let dadosConta = false
 
-    let lsDadosProfile = false
-
-    contatos['whats-users'].forEach(function(dados){
-
-        if((dados.number) == (numero)){
-
-            lsDadosProfile = {
-                'nickname': dados.nickname,
-                'account' : dados.account,
-                'image' : dados["profile-image"],
-                'background': dados.background,
-                'number' : dados.number,
-                'account_creation': dados["created-since"].start,
-                'account_closure': dados["created-since"].end,
+    contatos["whats-users"].forEach(function (usuario) {
+        if (numero == usuario.number) {
+            dadosConta = {
+                "account": usuario.account,
+                "nickname": usuario.nickname,
+                "profile_image": usuario["profile-image"],
+                "background": usuario.background,
+                "account_creation": usuario["created-since"].start,
+                "account_closure": usuario["created-since"].end
             }
         }
     })
-    return lsDadosProfile
+
+    return dadosConta
 }
 
-function dadosContatosUsuario(){
+function listarDadosContatos(numero) {
+    let listaContatos = []
+    let resultado = false
 
-    let lsContatosUsuarios = false
-
-    contatos['whats-users'].forEach(function(dados){
-        if((dados.number) == (numero)){
-
-            contatos
+    contatos["whats-users"].forEach(function (usuario) {
+        if (numero == usuario.number) {
+            usuario.contacts.forEach(function (contato) {
+                listaContatos.push({
+                    "name": contato.name,
+                    "image": contato.image,
+                    "description": contato.description
+                })
+            })
         }
     })
-    return lsContatosUsuarios
+
+    if (listaContatos.length > 0) {
+        return listaContatos
+    }
+
+    return resultado
 }
-console.log(dadosUsuarios())
-console.log(dadosProfile(11987876567))
-console.log(dadosContatosUsuario(11987876567))
+
+function listarMensagens(numero) {
+    let listaMensagens = []
+    let resultado = false
+
+    contatos["whats-users"].forEach(function (usuario) {
+        if (numero == usuario.number) {
+            usuario.contacts.forEach(function (contato) {
+                listaMensagens.push(contato.messages)
+            })
+        }
+    })
+
+    if (listaMensagens.length > 0) {
+        return listaMensagens
+    }
+
+    return resultado
+}
+
+function listarMensagensContato(numeroUser, nomeContato) {
+    let dadosUsuario = {}
+    let mensagensContato = []
+    let resultado = false
+
+    contatos["whats-users"].forEach(function (usuario) {
+        if (numeroUser == usuario.number) {
+
+            usuario.contacts.forEach(function (contato) {
+                if (nomeContato.toUpperCase() == contato.name.toUpperCase()) {
+                    mensagensContato.push(contato.messages)
+                }
+            })
+
+            dadosUsuario = {
+                "name": usuario.account,
+                "numero": usuario.number,
+                "mensagens": mensagensContato
+            }
+        }
+    })
+
+    if (mensagensContato.length > 0) {
+        return dadosUsuario
+    }
+
+    return resultado
+}
+
+function filtrarConversa(numero, nomeContato, palavra) {
+    let mensagensFiltradas = []
+    let resultado = false
+
+    contatos["whats-users"].forEach(function (usuario) {
+        if (numero == usuario.number) {
+            usuario.contacts.forEach(function (contato) {
+                if (nomeContato == contato.name) {
+
+                    contato.messages.forEach(function (mensagem) {
+                        if (mensagem.content.toLowerCase().includes(palavra.toLowerCase())) {
+                            mensagensFiltradas.push(mensagem)
+                        }
+                    })
+
+                }
+            })
+        }
+    })
+
+    if (mensagensFiltradas.length > 0) {
+        return mensagensFiltradas
+    }
+
+    return resultado
+}
+
+module.exports = {
+    listarDadosUsuarios,
+    listarDadosConta,
+    listarDadosContatos,
+    listarMensagens,
+    listarMensagensContato,
+    filtrarConversa
+}
